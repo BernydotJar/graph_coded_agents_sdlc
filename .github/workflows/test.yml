@@ -1,0 +1,25 @@
+name: Python regression and provenance
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Verify public MIT provenance
+        run: python3 scripts/verify_provenance.py
+      - name: Run all unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Compile Python
+        run: python3 -m compileall -q graph_harness coded_agents_sdlc
